@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח המשימות המשפחתי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+  :root{
+    --ink:#2B3A4A; --bg:#EAF2ED; --card:#FFFFFF;
+    --coral:#FF6B5D; --coral-dark:#C23F32;
+    --muted:#6B7A87; --line:#DCE7E1;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',sans-serif;min-height:100vh;}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:8px;flex-wrap:wrap;}
+  h1{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:32px;margin:0;letter-spacing:-0.5px;}
+  h1 span{color:var(--coral);}
+  .subtitle{color:var(--muted);font-size:14px;margin-top:4px;}
+  .btn{font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:none;border-radius:12px;padding:10px 18px;cursor:pointer;transition:transform .1s ease, filter .15s ease;}
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--coral);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.06);}
+  .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--coral);}
+  .btn-sm{padding:6px 12px;font-size:12.5px;border-radius:9px;}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .whoami{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 16px;margin-bottom:20px;font-size:14px;}
+  .whoami .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;}
+  .whoami .switch{margin-right:auto;font-size:12.5px;color:var(--muted);}
+  .switch a{color:var(--coral-dark);text-decoration:none;font-weight:700;}
+
+  .panel{background:var(--card);border-radius:18px;padding:20px 22px;margin-bottom:20px;box-shadow:0 2px 10px rgba(43,58,74,0.06);}
+  .panel h2{font-family:'Baloo 2',sans-serif;font-size:19px;margin:0 0 14px;font-weight:700;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:12.5px;color:var(--muted);font-weight:600;}
+  input[type=text],input[type=password]{font-family:'Nunito',sans-serif;padding:9px 12px;border-radius:10px;border:1.5px solid var(--line);font-size:14px;min-width:160px;outline:none;}
+  input[type=text]:focus,input[type=password]:focus{border-color:var(--coral);}
+  input[type=color]{width:42px;height:38px;border:none;border-radius:10px;padding:0;cursor:pointer;background:none;}
+
+  .days-picker{display:flex;gap:5px;}
+  .day-chip{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--muted);user-select:none;}
+  .day-chip.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  .list{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .list-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-radius:12px;padding:9px 14px;font-size:14px;gap:10px;}
+  .list-item .li-left{display:flex;align-items:center;gap:10px;overflow:hidden;}
+  .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+  .avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+  .icon-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;width:26px;height:26px;border-radius:50%;flex-shrink:0;}
+  .icon-x:hover{background:#fff;color:var(--coral-dark);}
+  .link-copy{font-size:12.5px;background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:4px 10px;cursor:pointer;flex-shrink:0;}
+
+  .board{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;}
+  @media (max-width:900px){ .board{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));} }
+  .day-col{background:var(--card);border-radius:16px;padding:12px;min-height:120px;box-shadow:0 2px 8px rgba(43,58,74,0.05);}
+  .day-col.today{box-shadow:0 0 0 2px var(--coral);}
+  .day-head{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14.5px;text-align:center;padding-bottom:8px;margin-bottom:10px;border-bottom:2px solid var(--bg);}
+  .day-head .dnum{display:block;font-size:11px;font-weight:400;color:var(--muted);font-family:'Nunito',sans-serif;margin-top:1px;}
+
+  .task-card{border-radius:12px;padding:10px 10px 8px;margin-bottom:8px;font-size:13px;}
+  .task-name{font-weight:700;margin-bottom:6px;line-height:1.3;}
+  .assigned-row{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12.5px;font-weight:700;margin-bottom:6px;}
+  .cal-link{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;text-decoration:none;color:inherit;opacity:0.85;}
+  .cal-link:hover{opacity:1;text-decoration:underline;}
+  .empty-day{color:var(--muted);font-size:12px;text-align:center;padding:14px 4px;}
+  .task-btn{width:100%;font-size:12px;padding:6px;border-radius:8px;border:1.5px dashed rgba(0,0,0,0.25);background:rgba(255,255,255,0.5);cursor:pointer;font-weight:700;}
+  .cap-note{font-size:11px;opacity:0.75;text-align:center;padding:4px 0;}
+
+  .foot-note{font-size:12px;color:var(--muted);margin-top:22px;line-height:1.6;text-align:center;}
+
+  #modalOverlay{display:none;position:fixed;inset:0;background:rgba(43,58,74,0.45);align-items:center;justify-content:center;z-index:100;}
+  .modal-box{background:#fff;border-radius:16px;padding:22px 24px;max-width:320px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,0.15);}
+  .modal-box h3{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:17px;margin:0 0 6px;}
+  .modal-box p{font-size:13.5px;color:var(--muted);margin:0 0 12px;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>לוח המשימות <span>שלנו</span></h1>
+      <div class="subtitle">כל ילד/ה נרשמים למשימה, ומקבלים תזכורת ביומן ב־10:00</div>
+    </div>
+    <button class="btn btn-ghost" id="toggleAdmin"><i class="ti ti-settings"></i> ניהול משימות וילדים</button>
+  </header>
+
+  <div id="whoamiBox"></div>
+
+  <div class="panel" id="adminPanel" style="display:none;">
+    <h2>ילדים במשפחה</h2>
+    <div class="row">
+      <div class="field"><label>שם הילד/ה</label><input type="text" id="kidName" placeholder="לדוגמה: נועה"></div>
+      <div class="field"><label>צבע</label><input type="color" id="kidColor" value="#56B4D3"></div>
+      <button class="btn btn-primary" id="addKidBtn">הוספה</button>
+    </div>
+    <div class="list" id="kidsList"></div>
+
+    <h2 style="margin-top:22px;">משימות אפשריות</h2>
+    <div class="row">
+      <div class="field" style="flex:1;"><label>שם המשימה</label><input type="text" id="taskName" placeholder="לדוגמה: לפנות את השולחן" style="width:100%;"></div>
+      <div class="field"><label>צבע</label><input type="color" id="taskColor" value="#FFC857"></div>
+    </div>
+    <div class="field" style="margin-top:10px;">
+      <label>באילו ימים המשימה חוזרת?</label>
+      <div class="days-picker" id="dayPicker"></div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+      <button class="btn btn-primary" id="addTaskBtn">הוספת משימה</button>
+    </div>
+    <div class="list" id="tasksList" style="margin-top:14px;"></div>
+  </div>
+
+  <div id="boardWrap"></div>
+
+  <div class="foot-note">
+    לחיצה על "תזכורת ביומן" פותחת חלון של Google Calendar עם אירוע שבועי חוזר, מוכן לשמירה — כל ילד/ה שומר/ת אותו ביומן שלו/ה.<br>
+    כל ילד/ה נרשמים רק לעצמם, דרך הקישור האישי שלהם, ועד פעמיים בשבוע לאותה משימה.
+  </div>
+</div>
+
+<div id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMsg"></p>
+    <input type="password" id="modalInput" style="width:100%;margin-bottom:6px;" inputmode="numeric">
+    <div id="modalError" style="font-size:12.5px;color:var(--coral-dark);min-height:16px;margin-bottom:8px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" id="modalCancel">ביטול</button>
+      <button class="btn btn-primary btn-sm" id="modalOk">אישור</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======= הגדרה: הדביקו כאן את כתובת ה-Web App שקיבלתם מ-Google Apps Script =======
+const API_URL = 'https://script.google.com/macros/s/AKfycbwn0aC0VRACwalONwoLyYj_vHJLCG0mUW1hDazMCaNDL22nMWRhC8GIrjLm_Ohk_9nX/exec';
+// ==================================================================================
+
+const DAY_NAMES = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
+const DAY_FULL = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const BYDAY = ['SU','MO','TU','WE','TH','FR','SA'];
+const WEEKLY_CAP = 2;
+
+const urlParams = new URLSearchParams(location.search);
+const myKidId = urlParams.get('kid');
+
+let state = { kids: [], tasks: [], assignments: [], pinSet: false };
+let parentPin = null;
+let unlocked = false;
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+async function api(action, params){
+  const qs = new URLSearchParams({ action, ...(params||{}) });
+  const res = await fetch(`${API_URL}?${qs.toString()}`);
+  const data = await res.json();
+  return data;
+}
+
+async function load(){
+  try{
+    const data = await api('getData');
+    if(data.error){ showBoardError(data.error); return; }
+    state = data;
+    render();
+  }catch(e){
+    showBoardError('לא הצלחתי להתחבר לשרת. ודאו שכתובת ה-API הודבקה נכון ושהיא פרוסה כ"Anyone".');
+  }
+}
+
+function showBoardError(msg){
+  document.getElementById('boardWrap').innerHTML = `<div class="empty-day" style="padding:40px;">${msg}</div>`;
+}
+
+// ---------- Modal ----------
+const modalOverlay = document.getElementById('modalOverlay');
+const modalTitle = document.getElementById('modalTitle');
+const modalMsg = document.getElementById('modalMsg');
+const modalInput = document.getElementById('modalInput');
+const modalError = document.getElementById('modalError');
+const modalOk = document.getElementById('modalOk');
+const modalCancel = document.getElementById('modalCancel');
+
+function askPin(title, message){
+  return new Promise((resolve) => {
+    modalTitle.textContent = title;
+    modalMsg.textContent = message;
+    modalInput.value = '';
+    modalError.textContent = '';
+    modalInput.style.display = 'block';
+    modalOverlay.style.display = 'flex';
+    modalInput.focus();
+    function cleanup(val){
+      modalOverlay.style.display = 'none';
+      modalOk.onclick = null; modalCancel.onclick = null; modalInput.onkeydown = null;
+      resolve(val);
+    }
+    modalOk.onclick = () => cleanup(modalInput.value.trim());
+    modalCancel.onclick = () => cleanup(null);
+    modalInput.onkeydown = (e) => { if(e.key === 'Enter') cleanup(modalInput.value.trim()); };
+  });
+}
+function showMessage(title, message){
+  return new Promise((resolve) => {
+    modalTitle.textContent = title;
+    modalMsg.textContent = message;
+    modalInput.style.display = 'none';
+    modalError.textContent = '';
+    modalOverlay.style.display = 'flex';
+    function cleanup(){
+      modalOverlay.style.display = 'none';
+      modalOk.onclick = null; modalCancel.onclick = null;
+      modalInput.style.display = 'block';
+      resolve();
+    }
+    modalOk.onclick = cleanup; modalCancel.onclick = cleanup;
+  });
+}
+
+function textColorFor(hex){
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+  const lum = (0.299*r + 0.587*g + 0.114*b)/255;
+  return lum > 0.6 ? '#2B3A4A' : '#FFFFFF';
+}
+
+function baseLink(){
+  return location.origin + location.pathname;
+}
+
+// ---------- Admin: Kids ----------
+document.getElementById('addKidBtn').onclick = async () => {
+  const nameInput = document.getElementById('kidName');
+  const colorInput = document.getElementById('kidColor');
+  const name = nameInput.value.trim();
+  if(!name) return;
+  const data = await api('addKid', { pin: parentPin, name, color: colorInput.value });
+  if(data.error){ await showMessage('שגיאה', data.error); return; }
+  state = data; nameInput.value = ''; render();
+};
+
+async function removeKid(id){
+  const data = await api('removeKid', { pin: parentPin, id });
+  if(data.error){ await showMessage('שגיאה', data.error); return; }
+  state = data; render();
+}
+
+// ---------- Admin: Tasks ----------
+let selectedDays = new Set();
+const dayPicker = document.getElementById('dayPicker');
+DAY_NAMES.forEach((label, idx) => {
+  const chip = document.createElement('div');
+  chip.className = 'day-chip';
+  chip.textContent = label;
+  chip.title = DAY_FULL[idx];
+  chip.onclick = () => {
+    if(selectedDays.has(idx)) selectedDays.delete(idx); else selectedDays.add(idx);
+    chip.classList.toggle('on');
+  };
+  dayPicker.appendChild(chip);
+});
+
+document.getElementById('addTaskBtn').onclick = async () => {
+  const nameInput = document.getElementById('taskName');
+  const colorInput = document.getElementById('taskColor');
+  const name = nameInput.value.trim();
+  if(!name || selectedDays.size === 0) return;
+  const data = await api('addTask', { pin: parentPin, name, color: colorInput.value, days: Array.from(selectedDays).sort().join(',') });
+  if(data.error){ await showMessage('שגיאה', data.error); return; }
+  state = data; nameInput.value = ''; selectedDays.clear();
+  dayPicker.querySelectorAll('.day-chip').forEach(c => c.classList.remove('on'));
+  render();
+};
+
+async function removeTask(id){
+  const data = await api('removeTask', { pin: parentPin, id });
+  if(data.error){ await showMessage('שגיאה', data.error); return; }
+  state = data; render();
+}
+
+document.getElementById('toggleAdmin').onclick = async () => {
+  const p = document.getElementById('adminPanel');
+  if(p.style.display === 'block'){ p.style.display = 'none'; unlocked = false; return; }
+  if(unlocked){ p.style.display = 'block'; return; }
+
+  if(!state.pinSet){
+    const chosen = await askPin('קוד הורים חדש', 'זו הפעם הראשונה — בחרו קוד סודי (מספר) שרק ההורים ידעו, כדי להגן על ניהול המשימות.');
+    if(!chosen) return;
+    const data = await api('setPin', { pin: chosen });
+    if(data.error){ await showMessage('שגיאה', data.error); return; }
+    state = data; parentPin = chosen; unlocked = true;
+    p.style.display = 'block'; render();
+    return;
+  }
+
+  const entered = await askPin('קוד הורים', 'הזינו את הקוד הסודי של ההורים כדי לנהל משימות וילדים.');
+  if(entered === null) return;
+  const check = await api('checkPin', { pin: entered });
+  if(check.valid){ parentPin = entered; unlocked = true; p.style.display = 'block'; }
+  else { await showMessage('קוד שגוי', 'הקוד שהוזן אינו תואם. נסו שוב.'); }
+};
+
+// ---------- Assignments ----------
+async function signUp(taskId, day){
+  if(!myKidId) return;
+  const data = await api('setAssignment', { taskId, day, kidId: myKidId });
+  if(data.error){ await showMessage('לא ניתן להירשם', data.error); return; }
+  state = data; render();
+}
+async function signOut(taskId, day){
+  if(!myKidId) return;
+  const data = await api('removeAssignment', { taskId, day, kidId: myKidId });
+  if(data.error){ await showMessage('שגיאה', data.error); return; }
+  state = data; render();
+}
+
+// ---------- Google Calendar link ----------
+function pad(n){ return n < 10 ? '0'+n : ''+n; }
+function fmt(date){ return date.getFullYear() + pad(date.getMonth()+1) + pad(date.getDate()) + 'T' + pad(date.getHours()) + pad(date.getMinutes()) + '00'; }
+function nextDateForDay(dayIdx){
+  const now = new Date();
+  const today = now.getDay();
+  let diff = dayIdx - today;
+  if(diff < 0) diff += 7;
+  if(diff === 0 && now.getHours() >= 10) diff = 7;
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff, 10, 0, 0);
+}
+function buildCalendarLink(taskName, kidName, dayIdx){
+  const start = nextDateForDay(dayIdx);
+  const end = new Date(start.getTime() + 15*60000);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `${taskName} - ${kidName}`,
+    dates: `${fmt(start)}/${fmt(end)}`,
+    details: `תזכורת שבועית למשימת הבית "${taskName}" עבור ${kidName}`,
+    recur: `RRULE:FREQ=WEEKLY;BYDAY=${BYDAY[dayIdx]}`,
+    ctz: 'Asia/Jerusalem'
+  });
+  return 'https://calendar.google.com/calendar/render?' + params.toString();
+}
+
+// ---------- Render ----------
+function render(){
+  renderWhoAmI();
+  renderKidsList();
+  renderTasksList();
+  renderBoard();
+}
+
+function renderWhoAmI(){
+  const box = document.getElementById('whoamiBox');
+  const me = state.kids.find(k => k.id === myKidId);
+  if(me){
+    const others = state.kids.filter(k => k.id !== me.id)
+      .map(k => `<a href="?kid=${k.id}">${k.name}</a>`).join(' · ');
+    box.innerHTML = `<div class="whoami">
+      <div class="avatar" style="background:${me.color};color:${textColorFor(me.color)};">${me.name.charAt(0)}</div>
+      <span>שלום, <b>${me.name}</b> 👋</span>
+      <span class="switch">${others ? 'לא אתה/את? ' + others : ''}</span>
+    </div>`;
+  } else if(myKidId){
+    box.innerHTML = `<div class="whoami">לא נמצא ילד/ה תואמים לקישור הזה.</div>`;
+  } else {
+    box.innerHTML = `<div class="whoami">זהו לוח כללי לצפייה. כדי להירשם למשימות, כל ילד/ה צריכ/ה לפתוח את הקישור האישי שלו/ה (זמין בפאנל הניהול).</div>`;
+  }
+}
+
+function renderKidsList(){
+  const list = document.getElementById('kidsList');
+  list.innerHTML = '';
+  if(state.kids.length === 0){ list.innerHTML = '<div class="empty-day">עדיין אין ילדים ברשימה.</div>'; return; }
+  state.kids.forEach(k => {
+    const item = document.createElement('div');
+    item.className = 'list-item';
+    const link = `${baseLink()}?kid=${k.id}`;
+    item.innerHTML = `
+      <div class="li-left">
+        <div class="avatar" style="background:${k.color};color:${textColorFor(k.color)};">${k.name.charAt(0)}</div>
+        <span>${k.name}</span>
+      </div>
+      <button class="link-copy" data-link="${link}">העתקת קישור אישי</button>
+      <button class="icon-x" title="הסרה" data-id="${k.id}"><i class="ti ti-x"></i></button>
+    `;
+    item.querySelector('.icon-x').onclick = () => removeKid(k.id);
+    item.querySelector('.link-copy').onclick = async (e) => {
+      await navigator.clipboard.writeText(e.target.dataset.link);
+      e.target.textContent = 'הועתק!';
+      setTimeout(() => { e.target.textContent = 'העתקת קישור אישי'; }, 1500);
+    };
+    list.appendChild(item);
+  });
+}
+
+function renderTasksList(){
+  const list = document.getElementById('tasksList');
+  list.innerHTML = '';
+  if(state.tasks.length === 0){ list.innerHTML = '<div class="empty-day">עדיין אין משימות ברשימה.</div>'; return; }
+  state.tasks.forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'list-item';
+    const daysLabel = t.days.map(d => DAY_NAMES[d]).join(' · ');
+    item.innerHTML = `
+      <div class="li-left"><div class="dot" style="background:${t.color};"></div><span><b>${t.name}</b> &nbsp;·&nbsp; ${daysLabel}</span></div>
+      <button class="icon-x" title="הסרה" data-id="${t.id}">&times;</button>
+    `;
+    item.querySelector('.icon-x').onclick = () => removeTask(t.id);
+    list.appendChild(item);
+  });
+}
+
+function renderBoard(){
+  const wrap = document.getElementById('boardWrap');
+  if(state.tasks.length === 0){
+    wrap.innerHTML = `<div class="empty-day" style="padding:40px;"><b>אין עדיין משימות</b><br>לחצו על "ניהול משימות וילדים" למעלה כדי להתחיל.</div>`;
+    return;
+  }
+  const today = new Date().getDay();
+  let html = '<div class="board">';
+  for(let day = 0; day < 7; day++){
+    const dayTasks = state.tasks.filter(t => t.days.includes(day));
+    html += `<div class="day-col ${day===today?'today':''}"><div class="day-head">${DAY_FULL[day]}<span class="dnum">${DAY_NAMES[day]}</span></div>`;
+    if(dayTasks.length === 0){
+      html += `<div class="empty-day">אין משימה</div>`;
+    } else {
+      dayTasks.forEach(t => {
+        const assignment = state.assignments.find(a => a.taskId === t.id && a.day === day);
+        const kid = assignment ? state.kids.find(k => k.id === assignment.kidId) : null;
+        const txtColor = textColorFor(t.color);
+        html += `<div class="task-card" style="background:${t.color};color:${txtColor};">
+          <div class="task-name">${t.name}</div>`;
+
+        if(kid){
+          const isMine = myKidId && kid.id === myKidId;
+          html += `<div class="assigned-row"><span><i class="ti ti-user-check" style="font-size:14px;vertical-align:-2px;"></i> ${kid.name}</span>
+            ${isMine ? `<button class="icon-x" style="background:rgba(255,255,255,0.5);" data-signout="${t.id}|${day}"><i class="ti ti-x"></i></button>` : ''}
+          </div>`;
+          if(isMine){
+            html += `<a class="cal-link" href="${buildCalendarLink(t.name, kid.name, day)}" target="_blank" rel="noopener"><i class="ti ti-calendar"></i> תזכורת ביומן</a>`;
+          }
+        } else if(myKidId){
+          const myCount = state.assignments.filter(a => a.taskId === t.id && a.kidId === myKidId).length;
+          if(myCount >= WEEKLY_CAP){
+            html += `<div class="cap-note">כבר נרשמת פעמיים למשימה זו השבוע</div>`;
+          } else {
+            html += `<button class="task-btn" data-signup="${t.id}|${day}">להירשם</button>`;
+          }
+        } else {
+          html += `<div class="cap-note">פנוי</div>`;
+        }
+        html += `</div>`;
+      });
+    }
+    html += `</div>`;
+  }
+  html += '</div>';
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll('[data-signup]').forEach(btn => {
+    btn.onclick = () => { const [taskId, day] = btn.dataset.signup.split('|'); signUp(taskId, Number(day)); };
+  });
+  wrap.querySelectorAll('[data-signout]').forEach(btn => {
+    btn.onclick = () => { const [taskId, day] = btn.dataset.signout.split('|'); signOut(taskId, Number(day)); };
+  });
+}
+
+load();
+</script>
+</body>
+</html>
