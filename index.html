@@ -364,7 +364,7 @@ function renderWhoAmI(){
     box.innerHTML = `<div class="whoami">
       <div class="avatar" style="background:${me.color};color:${textColorFor(me.color)};">${me.name.charAt(0)}</div>
       <span>שלום, <b>${me.name}</b> 👋</span>
-      <span class="switch">${others ? 'לא אתה/את? ' + others : ''}</span>
+     
     </div>`;
   } else if(myKidId){
     box.innerHTML = `<div class="whoami">לא נמצא ילד/ה תואמים לקישור הזה.</div>`;
